@@ -4,6 +4,9 @@
  */
 package com.wowza.wms.plugin;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import com.wowza.util.StringUtils;
 import com.wowza.wms.application.IApplicationInstance;
 import com.wowza.wms.logging.WMSLogger;
@@ -24,6 +27,15 @@ public class TranscoderControl extends ModuleBase
 			if (stream.isTranscodeResult())
 			{
 				return false;
+			}
+			
+			if (namesRegex != null) {
+				Matcher m = namesRegex.matcher(stream.getName());
+				if (m.matches()) {
+					return matchAllow;
+				} else {
+					return noMatchAllow;
+				}
 			}
 
 			logger.info(MODULE_NAME + ".isLiveStreamTranscode [" + transcoder + " : " + stream.getName() + " : " + names + "]", stream);
@@ -57,6 +69,7 @@ public class TranscoderControl extends ModuleBase
 
 	private WMSLogger logger;
 	private String names = "*";
+	private Pattern namesRegex = null;
 	private boolean matchAllow = true;
 	private boolean noMatchAllow = false;
 
@@ -64,6 +77,12 @@ public class TranscoderControl extends ModuleBase
 	{
 		logger = WMSLoggerFactory.getLoggerObj(appInstance);
 
+		// Compile the regex if it is set
+		String namesRegexStr = appInstance.getProperties().getPropertyStr(PROP_NAME_PREFIX + "NamesRegex");
+		if (namesRegexStr != null && namesRegexStr.length() > 0) {
+			namesRegex = Pattern.compile(namesRegexStr);
+		}
+		
 		names = appInstance.getProperties().getPropertyStr(PROP_NAME_PREFIX + "Names", names);
 		matchAllow = appInstance.getProperties().getPropertyBoolean(PROP_NAME_PREFIX + "MatchAllow", matchAllow);
 		noMatchAllow = appInstance.getProperties().getPropertyBoolean(PROP_NAME_PREFIX + "NoMatchAllow", noMatchAllow);

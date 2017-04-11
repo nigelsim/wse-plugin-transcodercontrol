@@ -10,6 +10,7 @@ This module provides the following functionality:
 * Whitelist which streams can be transcoded.
 * Blacklist which streams that should not be transcoded.
 * Use wildcard character for multiple streams.
+* Regex name matching using the 'transcoderControlNamesRegex' property
 
 ## More resources
 [Wowza Streaming Engine Server-Side API Reference](https://www.wowza.com/resources/WowzaStreamingEngine_ServerSideAPI.pdf)
